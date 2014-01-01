@@ -5,56 +5,35 @@ from evernote.api.client import EvernoteClient
 from evernote.edam.type.ttypes import Note
 #from evernote.edam.error import ttypes as Errors
 from xml.sax.saxutils import escape
-import sys, signal, os, getpass
+import sys, os, getpass, argparse
 import config
 
 
 class Everton():
 
-    def __init__(self, token, note_title):
+    def __init__(self, token):
         self.client = EvernoteClient(token=token)
-        self.note_title = note_title
-        self.note_content = str()
 
-    def setNote(self):
-        def handler(signum, frame):
-            def inHandler(signum, frame):
-                sys.exit(0)
-            signal.signal(signal.SIGINT, inHandler)
-            if self.isSetContent(self.note_content):
-                self.makeNote()
-            sys.exit(0)
-
-        signal.signal(signal.SIGINT, handler)
-
-        for line in iter(sys.stdin.readline, ''):
-            self.note_content += self.getContentFormat(line)
-            print line.replace('\r\n', '').replace('\r', '').replace('\n', '')
-        if self.isSetContent(self.note_content):
-            self.makeNote()
-
-    def makeNote(self):
-        note_store = self.client.get_note_store()
-        note = Note()
-        note.title = self.note_title
-        note.content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-        note.content += "<!DOCTYPE en-note SYSTEM \"http://xml.evernote.com/pub/enml2.dtd\">"
-        note.content += "<en-note>%s</en-note>" % self.note_content
-
+    def setNote(self, title, content, tag=None):
         try:
+            note_store = self.client.get_note_store()
+            note = Note()
+            if not tag is None:
+                note.tagNames = tag
+            note.title = title
+            note.content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            note.content += "<!DOCTYPE en-note SYSTEM \"http://xml.evernote.com/pub/enml2.dtd\">"
+            note.content += "<en-note>%s</en-note>" % content
             note_store.createNote(note)
         except:
             return False
-        print "Created note title is '" + self.note_title + "'"
-
         return True
 
     @staticmethod
     def getContentFormat(data):
-        data = data.replace('\r\n', '').replace('\n', '')
+        data = data.rstrip()
         data = '<div>' + escape(data) + '</div>'
         data = data.replace('<div></div>', '<div><br/></div>')
-
         return data
 
     @staticmethod
@@ -74,7 +53,7 @@ class Auth():
 
     def setDeveloperToken(self, filepass):
         print 'Get Evernote developer token -> ' + config.token_geturl
-        token = getpass.getpass(prompt='Set Token: ')
+        token = getpass.getpass(prompt='Set token: ')
         f = open(filepass, 'w')
         f.write(token)
         f.close()
@@ -91,9 +70,18 @@ class Auth():
 
 def main():
 
-    auth = Auth()
+    parser = argparse.ArgumentParser(description='everton')
+    parser.add_argument('title', type=str, help='note title')
+    parser.add_argument('--tag', type=str, help='note tag')
+    parser.add_argument('--version', action='version', version='%(prog)s 0.1')
+    args = parser.parse_args()
+
+    # Get note title tag
+    note_title = args.title
+    note_tag = args.tag
 
     # Get user developer token
+    auth = Auth()
     stdin_dafault = sys.stdin
     sys.stdin = file('/dev/tty')
 
@@ -106,14 +94,23 @@ def main():
 
     sys.stdin = stdin_dafault
 
-    # Get note title
-    note_title = config.note_title_default
-    if len(sys.argv) > 1:
-        note_title = sys.argv[1]
-
     # Set note content
-    everton = Everton(developer_token, note_title)
-    everton.setNote()
+    everton = Everton(developer_token)
+    note_content = str()
+
+    try:
+        for line in iter(sys.stdin.readline, ''):
+            note_content += everton.getContentFormat(line)
+            print line.rstrip()
+    except:
+        pass
+    finally:
+        # create note
+        if everton.isSetContent(note_content):
+            result = everton.setNote(note_title, note_content, note_tag)
+            if result:
+                print "\n"
+                print "Created note title is '" + note_title + "'"
 
 if __name__ == "__main__":
     main()
