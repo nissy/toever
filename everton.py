@@ -71,15 +71,19 @@ class Auth():
 
 def main():
 
-    parser = argparse.ArgumentParser(description='everton')
+    parser = argparse.ArgumentParser(description='everton 0.1')
     parser.add_argument('title', type=str, help='note title')
-    parser.add_argument('--tag', type=str, help='note tag')
+    parser.add_argument('--tags', type=str, help='note tags (multiple tag separated by comma)')
     parser.add_argument('--version', action='version', version='%(prog)s 0.1')
     args = parser.parse_args()
 
-    # Get note title tag
+    # Get note title
     note_title = args.title
-    note_tag = args.tag
+
+    # Get note tags
+    note_tags = None
+    if not args.tags is None:
+        note_tags = args.tags.split(',')
 
     # Get user developer token
     auth = Auth()
@@ -110,7 +114,7 @@ def main():
     finally:
         # create note
         if everton.isSetContent(note_content):
-            result = everton.setNote(note_title, note_content, note_tag)
+            result = everton.setNote(note_title, note_content, note_tags)
             print "\n"
             if result:
                 print textui.colored.blue("Created note title is '" + note_title + "'")
