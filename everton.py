@@ -3,16 +3,17 @@
 
 from evernote.api.client import EvernoteClient
 from evernote.edam.type.ttypes import Note
-#from evernote.edam.error import ttypes as Errors
+#from evernote.edam.error import ttypes as errors
 from xml.sax.saxutils import escape
+from clint import textui
 import sys, os, getpass, argparse
 import config
 
 
 class Everton():
 
-    def __init__(self, token):
-        self.client = EvernoteClient(token=token)
+    def __init__(self, token, sandbox=True):
+        self.client = EvernoteClient(token=token, sandbox=sandbox)
 
     def setNote(self, title, content, tag=None):
         try:
@@ -53,16 +54,16 @@ class Auth():
 
     def setDeveloperToken(self, filepass):
         print 'Get Evernote developer token -> ' + config.token_geturl
-        token = getpass.getpass(prompt='Set token: ')
+        token = getpass.getpass(prompt='Input token: ')
         f = open(filepass, 'w')
         f.write(token)
         f.close()
         os.chmod(filepass, 0600)
         return token
 
-    def isDeveloperToken(self, token):
+    def isDeveloperToken(self, token, sandbox=True):
         try:
-            EvernoteClient(token=token).get_note_store()
+            EvernoteClient(token=token, sandbox=sandbox).get_note_store()
         except:
             return False
         return True
@@ -85,33 +86,36 @@ def main():
     stdin_dafault = sys.stdin
     sys.stdin = file('/dev/tty')
 
-    developer_token = auth.getDeveloperToken(config.token_filepass)
-
-    while True:
-        if auth.isDeveloperToken(developer_token):
-            break
-        developer_token = auth.setDeveloperToken(config.token_filepass)
+    try:
+        while True:
+            developer_token = auth.getDeveloperToken(config.token_filepass)
+            if auth.isDeveloperToken(developer_token, config.token_sandbox):
+                break
+            developer_token = auth.setDeveloperToken(config.token_filepass)
+    except:
+        sys.exit(0)
 
     sys.stdin = stdin_dafault
 
     # Set note content
-    everton = Everton(developer_token)
+    everton = Everton(developer_token, config.token_sandbox)
     note_content = str()
 
     try:
         for line in iter(sys.stdin.readline, ''):
             note_content += everton.getContentFormat(line)
-            print line.rstrip()
+            print textui.colored.green(line.rstrip())
     except:
         pass
     finally:
         # create note
         if everton.isSetContent(note_content):
             result = everton.setNote(note_title, note_content, note_tag)
+            print "\n"
             if result:
-                print "\n"
-                print "Created note title is '" + note_title + "'"
+                print textui.colored.blue("Created note title is '" + note_title + "'")
+            else:
+                print textui.colored.red('Create note error')
 
 if __name__ == "__main__":
     main()
-
