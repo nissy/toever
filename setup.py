@@ -8,7 +8,7 @@ if sys.version_info < (2, 7):
     install_requires.append('argparse')
 
 setup(name='everton',
-      version='0.2',
+      version='0.3',
       description='Evernote command line tool',
       author='Yoshihiko Nishida',
       author_email='nishida@ngc224.org',
