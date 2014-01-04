@@ -15,12 +15,14 @@ class Everton():
     def __init__(self, token, sandbox=True):
         self.client = EvernoteClient(token=token, sandbox=sandbox)
 
-    def setNote(self, title, content, tag=None):
+    def createNote(self, title, content, tag=None, bookguid=None):
         try:
             note_store = self.client.get_note_store()
             note = Note()
             if not tag is None:
                 note.tagNames = tag
+            if not bookguid is None:
+                note.notebookGuid = bookguid
             note.title = title
             note.content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
             note.content += "<!DOCTYPE en-note SYSTEM \"http://xml.evernote.com/pub/enml2.dtd\">"
@@ -29,6 +31,11 @@ class Everton():
         except:
             return False
         return True
+
+
+    def listNotebooks(self):
+        note_store = self.client.get_note_store()
+        return note_store.listNotebooks()
 
     @staticmethod
     def getContentFormat(data):
@@ -53,7 +60,7 @@ class Auth():
         return self.setDeveloperToken(filepass)
 
     def setDeveloperToken(self, filepass):
-        print 'Get Evernote developer token -> ' + config.token_geturl
+        print('Get Evernote developer token -> ' + config.token_geturl)
         token = getpass.getpass(prompt='Input token: ')
         f = open(filepass, 'w')
         f.write(token)
@@ -71,10 +78,11 @@ class Auth():
 
 def main():
 
-    parser = argparse.ArgumentParser(description='everton version 0.2')
+    parser = argparse.ArgumentParser(description='everton version 0.3')
     parser.add_argument('title', type=str, help='note title')
     parser.add_argument('--tags', type=str, help='note tags (multiple tag separated by comma)')
-    parser.add_argument('--version', action='version', version='%(prog)s 0.2')
+    parser.add_argument('--notebook', type=str, help='note notebook')
+    parser.add_argument('--version', action='version', version='%(prog)s 0.3')
     args = parser.parse_args()
 
     # Get note title
@@ -88,7 +96,7 @@ def main():
     # Get user developer token
     auth = Auth()
     stdin_dafault = sys.stdin
-    sys.stdin = file('/dev/tty')
+    sys.stdin = open('/dev/tty', 'rt')
 
     try:
         while True:
@@ -101,25 +109,33 @@ def main():
 
     sys.stdin = stdin_dafault
 
-    # Set note content
     everton = Everton(developer_token, config.token_sandbox)
+
+    # Set note bookguid
+    note_bookguid = None
+    if not args.notebook is None:
+        for line in everton.listNotebooks():
+            if line.name == args.notebook:
+                note_bookguid = line.guid
+                break
+
+    # Set note content
     note_content = str()
 
     try:
         for line in iter(sys.stdin.readline, ''):
             note_content += everton.getContentFormat(line)
-            print textui.colored.green(line.rstrip())
+            print(textui.colored.green(line.rstrip()))
     except:
         pass
     finally:
         # create note
         if everton.isSetContent(note_content):
-            result = everton.setNote(note_title, note_content, note_tags)
-            print "\n"
+            result = everton.createNote(note_title, note_content, note_tags, note_bookguid)
             if result:
-                print textui.colored.blue("Created note title is '" + note_title + "'")
+                print("\n" + textui.colored.blue("Created note title is '" + note_title + "'"))
             else:
-                print textui.colored.red('Create note error')
+                print("\n" + textui.colored.red('Create note error'))
 
 if __name__ == "__main__":
     main()
