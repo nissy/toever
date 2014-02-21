@@ -41,7 +41,8 @@ class Everton():
     def getContentFormat(data):
         data = data.rstrip()
         data = '<div>' + escape(data) + '</div>'
-        data = data.replace('<div></div>', '<div><br/></div>')
+        data = data.replace(' ', ' ') #bytecode 20 -> c2a0
+        data = data.replace('<div></div>', '<div><br/></div>') + '\n'
         return data
 
     @staticmethod
@@ -82,7 +83,7 @@ def main():
     parser.add_argument('title', type=str, help='note title')
     parser.add_argument('--tags', type=str, help='note tags (multiple tag separated by comma)')
     parser.add_argument('--notebook', type=str, help='note notebook')
-    parser.add_argument('--version', action='version', version='%(prog)s 0.3')
+    parser.add_argument('--version', action='version', version='%(prog)s 0.4')
     args = parser.parse_args()
 
     # Get note title
