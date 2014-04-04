@@ -9,7 +9,6 @@ from clint import textui
 import sys, os, getpass, argparse
 import config
 
-
 class Everton():
 
     def __init__(self, token, sandbox=True):
@@ -31,7 +30,6 @@ class Everton():
         except:
             return False
         return True
-
 
     def listNotebooks(self):
         note_store = self.client.get_note_store()
@@ -79,11 +77,11 @@ class Auth():
 
 def main():
 
-    parser = argparse.ArgumentParser(description='everton version 0.4')
+    parser = argparse.ArgumentParser(description='everton version 0.5')
     parser.add_argument('title', type=str, help='note title')
     parser.add_argument('--tags', type=str, help='note tags (multiple tag separated by comma)')
     parser.add_argument('--notebook', type=str, help='note notebook')
-    parser.add_argument('--version', action='version', version='%(prog)s 0.4')
+    parser.add_argument('--version', action='version', version='%(prog)s 0.5')
     args = parser.parse_args()
 
     # Get note title

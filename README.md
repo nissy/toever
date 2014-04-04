@@ -29,7 +29,7 @@ Help
 
     usage: everton [-h] [--tags TAGS] [--notebook NOTEBOOK] [--version] title
     
-    everton version 0.4
+    everton version 0.5
     
     positional arguments:
       title                note title
