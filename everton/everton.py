@@ -79,7 +79,7 @@ class Auth():
 
 def main():
 
-    parser = argparse.ArgumentParser(description='everton version 0.3')
+    parser = argparse.ArgumentParser(description='everton version 0.4')
     parser.add_argument('title', type=str, help='note title')
     parser.add_argument('--tags', type=str, help='note tags (multiple tag separated by comma)')
     parser.add_argument('--notebook', type=str, help='note notebook')
