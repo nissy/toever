@@ -7,7 +7,7 @@ if sys.version_info < (2, 7):
     install_requires.append('argparse')
 
 setup(name='everstdin',
-      version='0.5',
+      version='0.6',
       description='Evernote command line tool',
       author='Yoshihiko Nishida',
       author_email='nishida@ngc224.org',
