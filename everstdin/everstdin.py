@@ -6,10 +6,11 @@ from evernote.edam.type.ttypes import Note
 #from evernote.edam.error import ttypes as errors
 from xml.sax.saxutils import escape
 from clint import textui
-import sys, os, getpass, argparse
+import sys, os, argparse
+from datetime import datetime
 import config
 
-class Everton():
+class Everstdin():
 
     def __init__(self, token, sandbox=True):
         self.client = EvernoteClient(token=token, sandbox=sandbox)
@@ -47,7 +48,6 @@ class Everton():
     def isSetContent(data):
         return len(data.replace('<div><br/></div>', '')) != 0
 
-
 class Auth():
 
     def getDeveloperToken(self, filepass):
@@ -59,8 +59,8 @@ class Auth():
         return self.setDeveloperToken(filepass)
 
     def setDeveloperToken(self, filepass):
-        print('Get Evernote developer token -> ' + config.token_geturl)
-        token = getpass.getpass(prompt='Input token: ')
+        print('Get Evernote Developer Token --> ' + config.token_geturl)
+        token = raw_input('Token: ')
         f = open(filepass, 'w')
         f.write(token)
         f.close()
@@ -74,18 +74,19 @@ class Auth():
             return False
         return True
 
-
 def main():
 
-    parser = argparse.ArgumentParser(description='everton version 0.5')
-    parser.add_argument('title', type=str, help='note title')
-    parser.add_argument('--tags', type=str, help='note tags (multiple tag separated by comma)')
+    parser = argparse.ArgumentParser(description=config.application_name + ' version ' + config.version)
+    parser.add_argument('-t', '--title', type=str, help='note title (omitted, the time is inputted automatically.)')
+    parser.add_argument('--tags', type=str, help='note tags (multiple tag separated by comma.)')
     parser.add_argument('--notebook', type=str, help='note notebook')
-    parser.add_argument('--version', action='version', version='%(prog)s 0.5')
+    parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + config.version)
     args = parser.parse_args()
 
     # Get note title
     note_title = args.title
+    if args.title is None:
+        note_title = 'Everstdin Post ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     # Get note tags
     note_tags = None
@@ -108,12 +109,12 @@ def main():
 
     sys.stdin = stdin_dafault
 
-    everton = Everton(developer_token, config.token_sandbox)
+    everstdin = Everstdin(developer_token, config.token_sandbox)
 
     # Set note bookguid
     note_bookguid = None
     if not args.notebook is None:
-        for line in everton.listNotebooks():
+        for line in everstdin.listNotebooks():
             if line.name == args.notebook:
                 note_bookguid = line.guid
                 break
@@ -123,14 +124,14 @@ def main():
 
     try:
         for line in iter(sys.stdin.readline, ''):
-            note_content += everton.getContentFormat(line)
+            note_content += everstdin.getContentFormat(line)
             print(textui.colored.green(line.rstrip()))
     except:
         pass
     finally:
         # create note
-        if everton.isSetContent(note_content):
-            result = everton.createNote(note_title, note_content, note_tags, note_bookguid)
+        if everstdin.isSetContent(note_content):
+            result = everstdin.createNote(note_title, note_content, note_tags, note_bookguid)
             if result:
                 print("\n" + textui.colored.blue("Created note title is '" + note_title + "'"))
             else:

@@ -1,21 +1,20 @@
 from setuptools import setup, find_packages
 import sys
 
-
 install_requires = ['evernote', 'clint']
 
 if sys.version_info < (2, 7):
     install_requires.append('argparse')
 
-setup(name='everton',
+setup(name='everstdin',
       version='0.5',
       description='Evernote command line tool',
       author='Yoshihiko Nishida',
       author_email='nishida@ngc224.org',
-      url='https://github.com/ngc224/everton',
+      url='https://github.com/ngc224/everstdin',
       packages=find_packages(),
       install_requires=install_requires,
       entry_points="""
       [console_scripts]
-      everton = everton.everton:main
+      everstdin = everstdin.everstdin:main
       """,)
