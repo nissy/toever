@@ -15,13 +15,13 @@ Usage
 
 Standard input is sent to Evernote.
 
-    $ echo 'Note Content' | everstdin -t 'Note Title'
+    $ echo 'Note Content' | everstdin
 
-    $ tail -f /var/log/access_log | everstdin 'apache access log' --tags accesslog
+    $ tail -f /var/log/access_log | everstdin -t 'apache access log'
 
     $ cat /etc/nginx/nginx.conf | everstdin --tags nginx,config --notebook linux
 
-    $ everstdin 'localhost hosts file' < /etc/hosts
+    $ everstdin -t 'localhost hosts file' < /etc/hosts
 
 Help
 -----
