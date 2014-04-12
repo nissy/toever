@@ -26,7 +26,7 @@ Standard input is sent to Evernote.
 Help
 -----
     $ everstdin -h
-    usage: everstdin.py [-h] [-t TITLE] [--tags TAGS] [--notebook NOTEBOOK] [-v]
+    usage: everstdin [-h] [-t TITLE] [--tags TAGS] [--notebook NOTEBOOK] [-v]
 
     everstdin version 0.6
 
