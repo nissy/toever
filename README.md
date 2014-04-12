@@ -8,12 +8,12 @@ Evernote command line tool.
 Install
 -----
 
-    $ pip install everstdin
+    $ sudo pip install everstdin
 
 Usage
 -----
 
-Standard input is sent to Evernote.
+The note of evernote will be created if standard input is passed to everstdin.
 
     $ echo 'Note Content' | everstdin
 
@@ -25,10 +25,8 @@ Standard input is sent to Evernote.
 
 Help
 -----
-    $ everstdin -h
-    usage: everstdin [-h] [-t TITLE] [--tags TAGS] [--notebook NOTEBOOK] [-v]
 
-    everstdin version 0.6
+    usage: everstdin [-h] [-t TITLE] [--tags TAGS] [--notebook NOTEBOOK] [-v]
 
     optional arguments:
       -h, --help            show this help message and exit
