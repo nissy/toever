@@ -41,6 +41,7 @@ class Everstdin():
         data = data.rstrip()
         data = '<div>' + escape(data) + '</div>'
         data = data.replace(' ', ' ') #bytecode 20 -> c2a0
+        data = data.replace('	', '    ') #tab -> c2a0
         data = data.replace('<div></div>', '<div><br/></div>') + '\n'
         return data
 
