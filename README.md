@@ -23,15 +23,16 @@ The note of evernote will be created if standard input is passed to everstdin.
 
     $ everstdin -t 'localhost hosts file' < /etc/hosts
 
-    $ cat ~/Desktop/aaa.jpg | everstdin --filename aaa.jpg
+If you specify a file name in the option, it is saved as an attachment.
+
+    $ cat ~/Desktop/aaa.jpg | everstdin -t aaa --filename aaa.jpg
 
     $ curl http://www.python.jp/images/pyjug.png | everstdin --filename python.jpg --tags python
 
 Help
 -----
 
-    usage: everstdin [-h] [-t TITLE] [--filename FILENAME] [--tags TAGS]
-                        [--notebook NOTEBOOK] [-v]
+    usage: everstdin [-h] [-t TITLE] [--filename FILENAME] [--tags TAGS] [--notebook NOTEBOOK] [-v]
 
     optional arguments:
       -h, --help            show this help message and exit
