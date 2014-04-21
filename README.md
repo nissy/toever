@@ -27,12 +27,15 @@ If you specify a file name in the option, it is saved as an attachment.
 
     $ cat ~/Desktop/aaa.jpg | everstdin -t aaa --filename aaa.jpg
 
-    $ curl http://www.python.jp/images/pyjug.png | everstdin --filename python.jpg --tags python
+    $ < ~/Desktop/bbb.jpg everstdin --filename bbb.jpg
+
+    $ curl http://www.python.jp/images/pyjug.png | everstdin --filename python.png --tags python
 
 Help
 -----
 
-    usage: everstdin [-h] [-t TITLE] [--filename FILENAME] [--tags TAGS] [--notebook NOTEBOOK] [-v]
+    usage: everstdin [-h] [-t TITLE] [--filename FILENAME] [--tags TAGS]
+                        [--notebook NOTEBOOK] [-v]
 
     optional arguments:
       -h, --help            show this help message and exit

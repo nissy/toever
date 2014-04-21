@@ -16,7 +16,7 @@ class Everstdin():
     def __init__(self, token, sandbox=True):
         self.client = EvernoteClient(token=token, sandbox=sandbox)
 
-    def createNote(self, title, content, tag=None, bookguid=None, resources=[]):
+    def createNote(self, title, content, tag=None, bookguid=None, resource=None):
         try:
             note_store = self.client.get_note_store()
             note = Note()
@@ -24,10 +24,9 @@ class Everstdin():
                 note.tagNames = tag
             if not bookguid is None:
                 note.notebookGuid = bookguid
-            if len(resources) > 0:
-                note.resources = resources
-                for resource in resources:
-                    content += "<span><en-media type=\"%s\" hash=\"%s\"/></span>" % (resource.mime, resource.data.bodyHash)
+            if not resource is None:
+                note.resources = [resource]
+                content += "<span><en-media type=\"%s\" hash=\"%s\"/></span>" % (resource.mime, resource.data.bodyHash)
             note.title = title
             note.content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
             note.content += "<!DOCTYPE en-note SYSTEM \"http://xml.evernote.com/pub/enml2.dtd\">"
@@ -53,6 +52,13 @@ class Everstdin():
     @staticmethod
     def isSetContent(data):
         return len(data.replace('<div><br/></div>', '')) != 0
+
+    @staticmethod
+    def isCreatePrint(result, title):
+        if result:
+            return "\n" + textui.colored.blue("Created note title is '" + title + "'")
+        else:
+            return "\n" + textui.colored.red('Create note error')
 
 class Auth():
 
@@ -130,7 +136,6 @@ def main():
     note_content = str()
 
     # Set binary stream
-    note_resources = []
     if not args.filename is None:
         data = Data()
         data.body = sys.stdin.read()
@@ -145,13 +150,9 @@ def main():
         attr.fileName = args.filename
         resource.attributes = attr
 
-        note_resources.append(resource)
-        result = everstdin.createNote(note_title, '', note_tags, note_bookguid, note_resources)
+        result = everstdin.createNote(note_title, '', note_tags, note_bookguid, resource)
+        print(everstdin.isCreatePrint(result, note_title))
 
-        if result:
-            print("\n" + textui.colored.blue("Created note title is '" + note_title + "'"))
-        else:
-            print("\n" + textui.colored.red('Create note error'))
         sys.exit(0)
 
     # Set text stream
@@ -165,10 +166,7 @@ def main():
         # create note
         if everstdin.isSetContent(note_content):
             result = everstdin.createNote(note_title, note_content, note_tags, note_bookguid)
-            if result:
-                print("\n" + textui.colored.blue("Created note title is '" + note_title + "'"))
-            else:
-                print("\n" + textui.colored.red('Create note error'))
+            print(everstdin.isCreatePrint(result, note_title))
 
 if __name__ == "__main__":
     main()
