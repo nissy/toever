@@ -3,10 +3,11 @@
 
 from evernote.api.client import EvernoteClient
 from evernote.edam.type.ttypes import Note
+from evernote.edam.type.ttypes import Resource, ResourceAttributes, Data
 #from evernote.edam.error import ttypes as errors
 from xml.sax.saxutils import escape
 from clint import textui
-import sys, os, argparse
+import sys, os, argparse, mimetypes, hashlib
 from datetime import datetime
 import config
 
@@ -15,7 +16,7 @@ class Everstdin():
     def __init__(self, token, sandbox=True):
         self.client = EvernoteClient(token=token, sandbox=sandbox)
 
-    def createNote(self, title, content, tag=None, bookguid=None):
+    def createNote(self, title, content, tag=None, bookguid=None, resources=[]):
         try:
             note_store = self.client.get_note_store()
             note = Note()
@@ -23,6 +24,10 @@ class Everstdin():
                 note.tagNames = tag
             if not bookguid is None:
                 note.notebookGuid = bookguid
+            if len(resources) > 0:
+                note.resources = resources
+                for resource in resources:
+                    content += "<span><en-media type=\"%s\" hash=\"%s\"/></span>" % (resource.mime, resource.data.bodyHash)
             note.title = title
             note.content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
             note.content += "<!DOCTYPE en-note SYSTEM \"http://xml.evernote.com/pub/enml2.dtd\">"
@@ -79,6 +84,7 @@ def main():
 
     parser = argparse.ArgumentParser(description=config.application_name + ' version ' + config.version)
     parser.add_argument('-t', '--title', type=str, help='note title (omitted, the time is inputted automatically.)')
+    parser.add_argument('--filename', type=str, help='note attachment file name')
     parser.add_argument('--tags', type=str, help='note tags (multiple tag separated by comma.)')
     parser.add_argument('--notebook', type=str, help='note notebook')
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + config.version)
@@ -123,6 +129,32 @@ def main():
     # Set note content
     note_content = str()
 
+    # Set binary stream
+    note_resources = []
+    if not args.filename is None:
+        data = Data()
+        data.body = sys.stdin.read()
+        data.size = len(data.body)
+        data.bodyHash = hashlib.md5(data.body).hexdigest()
+
+        resource = Resource()
+        resource.mime = mimetypes.guess_type(args.filename)[0]
+        resource.data = data
+
+        attr = ResourceAttributes()
+        attr.fileName = args.filename
+        resource.attributes = attr
+
+        note_resources.append(resource)
+        result = everstdin.createNote(note_title, '', note_tags, note_bookguid, note_resources)
+
+        if result:
+            print("\n" + textui.colored.blue("Created note title is '" + note_title + "'"))
+        else:
+            print("\n" + textui.colored.red('Create note error'))
+        sys.exit(0)
+
+    # Set text stream
     try:
         for line in iter(sys.stdin.readline, ''):
             note_content += everstdin.getContentFormat(line)

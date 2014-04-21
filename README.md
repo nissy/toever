@@ -23,16 +23,22 @@ The note of evernote will be created if standard input is passed to everstdin.
 
     $ everstdin -t 'localhost hosts file' < /etc/hosts
 
+    $ cat ~/Desktop/aaa.jpg | everstdin --filename aaa.jpg
+
+    $ curl http://www.python.jp/images/pyjug.png | everstdin --filename python.jpg --tags python
+
 Help
 -----
 
-    usage: everstdin [-h] [-t TITLE] [--tags TAGS] [--notebook NOTEBOOK] [-v]
+    usage: everstdin [-h] [-t TITLE] [--filename FILENAME] [--tags TAGS]
+                        [--notebook NOTEBOOK] [-v]
 
     optional arguments:
       -h, --help            show this help message and exit
       -t TITLE, --title TITLE
                             note title (omitted, the time is inputted
                             automatically.)
+      --filename FILENAME   note attachment file name
       --tags TAGS           note tags (multiple tag separated by comma.)
       --notebook NOTEBOOK   note notebook
       -v, --version         show program's version number and exit
