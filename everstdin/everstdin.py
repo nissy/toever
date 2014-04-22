@@ -40,6 +40,17 @@ class Everstdin():
         note_store = self.client.get_note_store()
         return note_store.listNotebooks()
 
+    def getResultText(self, result, title):
+        user = self.client.get_user_store().getUser()
+        note_store = self.client.get_note_store()
+        sync_state = note_store.getSyncState()
+        user_usage = "%s MB / %s MB" % \
+                     (self.roundMbSize(sync_state.uploaded), self.roundMbSize(user.accounting.uploadLimitNextMonth))
+        if result:
+            return "\n" + user_usage + "\n" + textui.colored.blue("Created note title is '" + title + "'")
+        else:
+            return "\n" + user_usage + "\n" + textui.colored.red('Create note error')
+
     @staticmethod
     def getContentFormat(data):
         data = data.rstrip()
@@ -54,11 +65,8 @@ class Everstdin():
         return len(data.replace('<div><br/></div>', '')) != 0
 
     @staticmethod
-    def isCreatePrint(result, title):
-        if result:
-            return "\n" + textui.colored.blue("Created note title is '" + title + "'")
-        else:
-            return "\n" + textui.colored.red('Create note error')
+    def roundMbSize(size):
+        return str(round(size / (1024.0 ** 2)))
 
 class Auth():
 
@@ -90,7 +98,7 @@ def main():
 
     parser = argparse.ArgumentParser(description=config.application_name + ' version ' + config.version)
     parser.add_argument('-t', '--title', type=str, help='note title (omitted, the time is inputted automatically.)')
-    parser.add_argument('--filename', type=str, help='note attachment file name')
+    parser.add_argument('-f', '--filename', type=str, help='note attachment file name')
     parser.add_argument('--tags', type=str, help='note tags (multiple tag separated by comma.)')
     parser.add_argument('--notebook', type=str, help='note notebook')
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + config.version)
@@ -151,7 +159,7 @@ def main():
         resource.attributes = attr
 
         result = everstdin.createNote(note_title, '', note_tags, note_bookguid, resource)
-        print(everstdin.isCreatePrint(result, note_title))
+        print(everstdin.getResultText(result, note_title))
 
         sys.exit(0)
 
@@ -166,7 +174,7 @@ def main():
         # create note
         if everstdin.isSetContent(note_content):
             result = everstdin.createNote(note_title, note_content, note_tags, note_bookguid)
-            print(everstdin.isCreatePrint(result, note_title))
+            print(everstdin.getResultText(result, note_title))
 
 if __name__ == "__main__":
     main()
