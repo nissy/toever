@@ -32,24 +32,18 @@ class Everstdin():
             note.content += "<!DOCTYPE en-note SYSTEM \"http://xml.evernote.com/pub/enml2.dtd\">"
             note.content += "<en-note>%s</en-note>" % content
             note_store.createNote(note)
+            upload_limit_next_month = self.client.get_user_store().getUser().accounting.uploadLimitNextMonth
+            user_upload = note_store.getSyncState().uploaded
+            user_upload_state = "%s MB / %s MB" % (self.roundMbSize(user_upload), self.roundMbSize(upload_limit_next_month))
         except:
-            return False
-        return True
+            print "\n" + user_upload_state + "\n" + textui.colored.red('Create note error')
+            return 1
+        print "\n" + user_upload_state + "\n" + textui.colored.blue("Created note title is '" + title + "'")
+        return 0
 
     def listNotebooks(self):
         note_store = self.client.get_note_store()
         return note_store.listNotebooks()
-
-    def getResultText(self, result, title):
-        user = self.client.get_user_store().getUser()
-        note_store = self.client.get_note_store()
-        sync_state = note_store.getSyncState()
-        user_usage = "%s MB / %s MB" % \
-                     (self.roundMbSize(sync_state.uploaded), self.roundMbSize(user.accounting.uploadLimitNextMonth))
-        if result:
-            return "\n" + user_usage + "\n" + textui.colored.blue("Created note title is '" + title + "'")
-        else:
-            return "\n" + user_usage + "\n" + textui.colored.red('Create note error')
 
     @staticmethod
     def getContentFormat(data):
@@ -95,7 +89,6 @@ class Auth():
         return True
 
 def main():
-
     parser = argparse.ArgumentParser(description=config.application_name + ' version ' + config.version)
     parser.add_argument('-t', '--title', type=str, help='note title (omitted, the time is inputted automatically.)')
     parser.add_argument('-f', '--filename', type=str, help='note attachment file name')
@@ -126,7 +119,7 @@ def main():
                 break
             developer_token = auth.setDeveloperToken(config.token_filepass)
     except:
-        sys.exit(0)
+        return 1
 
     sys.stdin = stdin_dafault
 
@@ -149,19 +142,13 @@ def main():
         data.body = sys.stdin.read()
         data.size = len(data.body)
         data.bodyHash = hashlib.md5(data.body).hexdigest()
-
         resource = Resource()
         resource.mime = mimetypes.guess_type(args.filename)[0]
         resource.data = data
-
         attr = ResourceAttributes()
         attr.fileName = args.filename
         resource.attributes = attr
-
-        result = everstdin.createNote(note_title, '', note_tags, note_bookguid, resource)
-        print(everstdin.getResultText(result, note_title))
-
-        sys.exit(0)
+        return everstdin.createNote(note_title, note_content, note_tags, note_bookguid, resource)
 
     # Set text stream
     try:
@@ -173,8 +160,8 @@ def main():
     finally:
         # create note
         if everstdin.isSetContent(note_content):
-            result = everstdin.createNote(note_title, note_content, note_tags, note_bookguid)
-            print(everstdin.getResultText(result, note_title))
+            return everstdin.createNote(note_title, note_content, note_tags, note_bookguid)
+    return 1
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

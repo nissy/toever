@@ -4,7 +4,7 @@
 import os
 
 application_name = 'everstdin'
-version = '0.9'
+version = '1.0'
 
 token_sandbox = False
 token_filepass = os.environ['HOME'] + '/.' + application_name

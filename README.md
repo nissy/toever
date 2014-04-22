@@ -34,7 +34,7 @@ If you specify a file name in the option, it is saved as an attachment.
 Help
 -----
 
-    usage: everstdin [-h] [-t TITLE] [--filename FILENAME] [--tags TAGS]
+    usage: everstdin [-h] [-t TITLE] [-f FILENAME] [--tags TAGS]
                         [--notebook NOTEBOOK] [-v]
 
     optional arguments:
@@ -42,7 +42,8 @@ Help
       -t TITLE, --title TITLE
                             note title (omitted, the time is inputted
                             automatically.)
-      --filename FILENAME   note attachment file name
+      -f FILENAME, --filename FILENAME
+                            note attachment file name
       --tags TAGS           note tags (multiple tag separated by comma.)
       --notebook NOTEBOOK   note notebook
       -v, --version         show program's version number and exit
