@@ -25,11 +25,13 @@ The note of evernote will be created if standard input is passed to everstdin.
 
 If you specify a file name in the option, it is saved as an attachment.
 
-    $ cat ~/Desktop/aaa.jpg | everstdin -t aaa --filename aaa.jpg
+    $ cat ~/Desktop/aaa.jpg | everstdin -t aaa -f aaa.jpg
 
-    $ < ~/Desktop/bbb.jpg everstdin --filename bbb.jpg
+    $ < ~/Desktop/bbb.png everstdin -f bbb.png
 
-    $ curl http://www.python.jp/images/pyjug.png | everstdin --filename python.png --tags python
+    $ curl http://wwwimages.adobe.com/www.adobe.com/content/dam/Adobe/en/legal/licenses-terms/pdf/Reader_11_0_jp.pdf | everstdin -f Adobe.pdf
+
+    $ curl http://www.python.jp/images/pyjug.png | everstdin -f python.png --tags python
 
 Help
 -----
