@@ -1,4 +1,4 @@
-everstdin
+toever
 =======
 
 About
@@ -8,37 +8,43 @@ Evernote command line tool.
 Install
 -----
 
-    $ sudo pip install everstdin
+    $ sudo pip install toever
 
 Usage
 -----
+File to send to evernote
 
-The note of evernote will be created if standard input is passed to everstdin.
+    $ toever ~/aaa.txt
 
-    $ echo 'Note Content' | everstdin
+    $ toever /etc/hosts -t 'My Hosts File'
 
-    $ tail -f /var/log/access_log | everstdin -t 'apache access log'
+    $ toever ~/photo.jpg --notebook 'photo'
+    
+The note of evernote will be created if standard input is passed to toever.
 
-    $ cat /etc/nginx/nginx.conf | everstdin --tags nginx,config --notebook linux
+    $ cat /etc/nginx/nginx.conf | toever --tags nginx,config --notebook linux
 
-    $ everstdin -t 'localhost hosts file' < /etc/hosts
+    $ toever -t 'localhost hosts file' < /etc/hosts
+    
+    $ tail -f /var/log/access_log | toever
 
 If you specify a file name in the option, it is saved as an attachment.
 
-    $ cat ~/Desktop/aaa.jpg | everstdin -t aaa -f aaa.jpg
+    $ cat ~/photo.jpg | toever -f photo.jpg
 
-    $ < ~/Desktop/bbb.png everstdin -f bbb.png
+    $ curl https://www.python.org/static/img/python-logo.png | toever -f python.png --tags python
 
-    $ curl http://wwwimages.adobe.com/www.adobe.com/content/dam/Adobe/en/legal/licenses-terms/pdf/Reader_11_0_jp.pdf | everstdin -f Adobe.pdf
-
-    $ curl http://www.python.jp/images/pyjug.png | everstdin -f python.png --tags python
+    $ curl http://wwwimages.adobe.com/www.adobe.com/content/dam/Adobe/en/legal/licenses-terms/pdf/Reader_11_0_jp.pdf | toever -f Adobe.pdf
 
 Help
 -----
-
-    usage: everstdin [-h] [-t TITLE] [-f FILENAME] [--tags TAGS]
-                        [--notebook NOTEBOOK] [-v]
-
+    usage: toever [-h] [-t TITLE] [-f FILENAME] [--tags TAGS]
+                     [--notebook NOTEBOOK] [-v]
+                     [file]
+    
+    positional arguments:
+      file                  file to send to evernote
+    
     optional arguments:
       -h, --help            show this help message and exit
       -t TITLE, --title TITLE

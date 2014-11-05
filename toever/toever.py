@@ -4,15 +4,15 @@
 from evernote.api.client import EvernoteClient
 from evernote.edam.type.ttypes import Note
 from evernote.edam.type.ttypes import Resource, ResourceAttributes, Data
-#from evernote.edam.error import ttypes as errors
+# from evernote.edam.error import ttypes as errors
 from xml.sax.saxutils import escape
 from clint import textui
 import sys, os, argparse, mimetypes, hashlib
 from datetime import datetime
 import config
 
-class Everstdin():
 
+class Toever():
     def __init__(self, token, sandbox=True):
         self.client = EvernoteClient(token=token, sandbox=sandbox)
 
@@ -34,7 +34,8 @@ class Everstdin():
             note_store.createNote(note)
             upload_limit_next_month = self.client.get_user_store().getUser().accounting.uploadLimitNextMonth
             user_upload = note_store.getSyncState().uploaded
-            user_upload_state = "%s MB / %s MB" % (self.roundMbSize(user_upload), self.roundMbSize(upload_limit_next_month))
+            user_upload_state = "%s MB / %s MB" % (
+                self.roundMbSize(user_upload), self.roundMbSize(upload_limit_next_month))
         except:
             print "\n" + user_upload_state + "\n" + textui.colored.red('Create note error')
             return 1
@@ -49,8 +50,8 @@ class Everstdin():
     def getContentFormat(data):
         data = data.rstrip()
         data = '<div>' + escape(data) + '</div>'
-        data = data.replace(' ', ' ') #bytecode 20 -> c2a0
-        data = data.replace('	', '    ') #tab -> c2a0
+        data = data.replace(' ', ' ')  # bytecode 20 -> c2a0
+        data = data.replace('	', '    ')  # tab -> c2a0
         data = data.replace('<div></div>', '<div><br/></div>') + '\n'
         return data
 
@@ -62,8 +63,8 @@ class Everstdin():
     def roundMbSize(size):
         return str(round(size / (1024.0 ** 2)))
 
-class Auth():
 
+class Auth():
     def getDeveloperToken(self, filepass):
         if os.path.exists(filepass):
             f = open(filepass, 'r')
@@ -88,19 +89,42 @@ class Auth():
             return False
         return True
 
+
+class Util():
+    @staticmethod
+    def isBinary(data):
+        for encoding in ['utf-8', 'shift-jis', 'euc-jp', 'iso2022-jp']:
+            try:
+                data = data.decode(encoding)
+                break
+            except:
+                pass
+        if isinstance(data, unicode):
+            return False
+        return True
+
+
 def main():
     parser = argparse.ArgumentParser(description=config.application_name + ' version ' + config.version)
+    parser.add_argument('file', nargs='?', action='store', help='file to send to evernote')
     parser.add_argument('-t', '--title', type=str, help='note title (omitted, the time is inputted automatically.)')
     parser.add_argument('-f', '--filename', type=str, help='note attachment file name')
     parser.add_argument('--tags', type=str, help='note tags (multiple tag separated by comma.)')
     parser.add_argument('--notebook', type=str, help='note notebook')
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + config.version)
+
     args = parser.parse_args()
+
+    # File check
+    if not args.file is None:
+        sys.stdin = open(args.file, 'r')
+        if Util.isBinary(open(args.file, 'r').read()) and args.filename is None:
+            args.filename = args.file
 
     # Get note title
     note_title = args.title
     if args.title is None:
-        note_title = 'Everstdin Post ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        note_title = 'ToEver Post ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     # Get note tags
     note_tags = None
@@ -123,12 +147,12 @@ def main():
 
     sys.stdin = stdin_dafault
 
-    everstdin = Everstdin(developer_token, config.token_sandbox)
+    toever = Toever(developer_token, config.token_sandbox)
 
     # Set note bookguid
     note_bookguid = None
     if not args.notebook is None:
-        for line in everstdin.listNotebooks():
+        for line in toever.listNotebooks():
             if line.name == args.notebook:
                 note_bookguid = line.guid
                 break
@@ -148,20 +172,21 @@ def main():
         attr = ResourceAttributes()
         attr.fileName = args.filename
         resource.attributes = attr
-        return everstdin.createNote(note_title, note_content, note_tags, note_bookguid, resource)
+        return toever.createNote(note_title, note_content, note_tags, note_bookguid, resource)
 
     # Set text stream
     try:
         for line in iter(sys.stdin.readline, ''):
-            note_content += everstdin.getContentFormat(line)
+            note_content += toever.getContentFormat(line)
             print(textui.colored.green(line.rstrip()))
     except:
         pass
     finally:
         # create note
-        if everstdin.isSetContent(note_content):
-            return everstdin.createNote(note_title, note_content, note_tags, note_bookguid)
+        if toever.isSetContent(note_content):
+            return toever.createNote(note_title, note_content, note_tags, note_bookguid)
     return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

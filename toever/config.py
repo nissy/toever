@@ -3,8 +3,8 @@
 
 import os
 
-application_name = 'everstdin'
-version = '1.0'
+application_name = 'toever'
+version = '1.1'
 
 token_sandbox = False
 token_filepass = os.environ['HOME'] + '/.' + application_name
