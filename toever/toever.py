@@ -117,6 +117,9 @@ def main():
 
     # File check
     if not args.file is None:
+        if not os.path.isfile(args.file):
+            print(textui.colored.red('File does not exist ' + args.file))
+            return 1
         sys.stdin = open(args.file, 'r')
         if Util.isBinary(open(args.file, 'r').read()) and args.filename is None:
             args.filename = args.file
