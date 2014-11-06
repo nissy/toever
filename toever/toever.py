@@ -12,7 +12,7 @@ from datetime import datetime
 import config as sys_config
 
 
-class Toever():
+class ToEver():
     def __init__(self, token, sandbox=True):
         self.client = EvernoteClient(token=token, sandbox=sandbox)
 
@@ -66,18 +66,17 @@ class Toever():
 
 class UserConfig():
     def __init__(self, filepath):
-
         self.filepath = filepath
         self.user_config = ConfigParser.SafeConfigParser()
-        self.user_config.read(self.filepath)
-
         try:
+            self.user_config.read(self.filepath)
             self.getUserOption('developer_token')
         except:
             user_config = ConfigParser.RawConfigParser()
             user_config.add_section(sys_config.application_name)
             user_config.set(sys_config.application_name, 'developer_token')
             user_config.set(sys_config.application_name, 'notebook')
+            user_config.set(sys_config.application_name, 'tags')
             with open(self.filepath, 'wb') as configfile:
                 user_config.write(configfile)
                 os.chmod(self.filepath, 0600)
@@ -87,7 +86,7 @@ class UserConfig():
         return self.user_config.get(sys_config.application_name, option)
 
     def setDeveloperToken(self):
-        print(textui.colored.green('Get Evernote DeveloperToken --> ' + sys_config.token_geturl))
+        print(textui.colored.green('Get Evernote developer token --> ' + sys_config.token_geturl))
         while True:
             developer_token = raw_input('Token: ')
             if self.isDeveloperToken(developer_token, sys_config.token_sandbox):
@@ -95,9 +94,15 @@ class UserConfig():
                 return self
 
     def setDefaultNotebook(self):
-        print(textui.colored.green('Set ToEver Default Post Notebook'))
+        print(textui.colored.green('Set ToEver default post notebook / Not enter if you do not set'))
         notebook = raw_input('Notebook: ')
         self.user_config.set(sys_config.application_name, 'notebook', notebook)
+        return self
+
+    def setDefaultTags(self):
+        print(textui.colored.green('Set ToEver default post tags / Not enter if you do not set'))
+        tags = raw_input('Tags: ')
+        self.user_config.set(sys_config.application_name, 'tags', tags)
         return self
 
     def save(self):
@@ -142,7 +147,7 @@ def main():
 
     # Set user config
     if args.config:
-        user_config.setDeveloperToken().setDefaultNotebook().save()
+        user_config.setDeveloperToken().setDefaultNotebook().setDefaultTags().save()
         return 0
 
     # File check
@@ -161,6 +166,10 @@ def main():
 
     # Get note tags
     note_tags = None
+
+    if args.tags is None and user_config.getUserOption('tags'):
+        args.tags = user_config.getUserOption('tags')
+
     if not args.tags is None:
         note_tags = args.tags.split(',')
 
@@ -173,7 +182,7 @@ def main():
 
     sys.stdin = stdin_dafault
 
-    toever = Toever(user_config.getUserOption('developer_token'), sys_config.token_sandbox)
+    toever = ToEver(user_config.getUserOption('developer_token'), sys_config.token_sandbox)
 
     # Set note bookguid
     note_bookguid = None
