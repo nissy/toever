@@ -74,9 +74,9 @@ class UserConfig():
         except:
             user_config = ConfigParser.RawConfigParser()
             user_config.add_section(sys_config.application_name)
-            user_config.set(sys_config.application_name, 'developer_token')
-            user_config.set(sys_config.application_name, 'notebook')
-            user_config.set(sys_config.application_name, 'tags')
+            user_config.set(sys_config.application_name, 'developer_token', '')
+            user_config.set(sys_config.application_name, 'notebook', '')
+            user_config.set(sys_config.application_name, 'tags', '')
             with open(self.filepath, 'wb') as configfile:
                 user_config.write(configfile)
                 os.chmod(self.filepath, 0600)
