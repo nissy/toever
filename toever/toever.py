@@ -108,6 +108,7 @@ class UserConfig():
         try:
             EvernoteClient(token=token, sandbox=sandbox).get_note_store()
         except:
+            print(textui.colored.red('Token can not be used'))
             return False
         return True
 
@@ -167,13 +168,8 @@ def main():
     stdin_dafault = sys.stdin
     sys.stdin = open('/dev/tty', 'rt')
 
-    try:
-        while True:
-            if user_config.isDeveloperToken(user_config.getUserOption('developer_token'), sys_config.token_sandbox):
-                break
-            user_config.setDeveloperToken().save()
-    except:
-        return 1
+    if not user_config.isDeveloperToken(user_config.getUserOption('developer_token'), sys_config.token_sandbox):
+        user_config.setDeveloperToken().save()
 
     sys.stdin = stdin_dafault
 

@@ -37,15 +37,13 @@ If you specify a file name in the option, it is saved as an attachment.
 
     $ curl https://www.python.org/static/img/python-logo.png | toever -f python.png --tags python
 
-    $ wget -O - https://pypi.python.org/packages/source/t/toever/toever-1.2.tar.gz | toever -f toever-1.2.tar.gz
+    $ wget -O - https://github.com/ngc224/toever/archive/master.tar.gz | toever -f master.tar.gz
 
 Help
 -----
     usage: toever [-h] [-t TITLE] [-f FILENAME] [--tags TAGS]
                      [--notebook NOTEBOOK] [--config] [-v]
                      [file]
-    
-    toever version 1.3
     
     positional arguments:
       file                  file to send to evernote
