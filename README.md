@@ -7,8 +7,11 @@ Evernote command line tool.
 
 Install
 -----
-
     $ sudo pip install toever
+
+Setup
+-----
+    $ toever --config
 
 Usage
 -----
@@ -34,13 +37,15 @@ If you specify a file name in the option, it is saved as an attachment.
 
     $ curl https://www.python.org/static/img/python-logo.png | toever -f python.png --tags python
 
-    $ curl http://wwwimages.adobe.com/www.adobe.com/content/dam/Adobe/en/legal/licenses-terms/pdf/Reader_11_0_jp.pdf | toever -f Adobe.pdf
+    $ wget -O - https://pypi.python.org/packages/source/t/toever/toever-1.2.tar.gz | toever -f toever-1.2.tar.gz
 
 Help
 -----
     usage: toever [-h] [-t TITLE] [-f FILENAME] [--tags TAGS]
-                     [--notebook NOTEBOOK] [-v]
+                     [--notebook NOTEBOOK] [--config] [-v]
                      [file]
+    
+    toever version 1.3
     
     positional arguments:
       file                  file to send to evernote
@@ -54,4 +59,5 @@ Help
                             note attachment file name
       --tags TAGS           note tags (multiple tag separated by comma.)
       --notebook NOTEBOOK   note notebook
+      --config              set user config
       -v, --version         show program's version number and exit

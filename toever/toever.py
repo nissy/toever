@@ -7,9 +7,9 @@ from evernote.edam.type.ttypes import Resource, ResourceAttributes, Data
 # from evernote.edam.error import ttypes as errors
 from xml.sax.saxutils import escape
 from clint import textui
-import sys, os, argparse, mimetypes, hashlib
+import sys, os, argparse, mimetypes, hashlib, ConfigParser
 from datetime import datetime
-import config
+import config as sys_config
 
 
 class Toever():
@@ -64,25 +64,47 @@ class Toever():
         return str(round(size / (1024.0 ** 2)))
 
 
-class Auth():
-    def getDeveloperToken(self, filepass):
-        if os.path.exists(filepass):
-            f = open(filepass, 'r')
-            token = f.readline()
-            f.close()
-            return token
-        return self.setDeveloperToken(filepass)
+class UserConfig():
+    def __init__(self, filepath):
 
-    def setDeveloperToken(self, filepass):
-        print('Get Evernote Developer Token --> ' + config.token_geturl)
-        token = raw_input('Token: ')
-        f = open(filepass, 'w')
-        f.write(token)
-        f.close()
-        os.chmod(filepass, 0600)
-        return token
+        self.filepath = filepath
+        self.user_config = ConfigParser.SafeConfigParser()
+        self.user_config.read(self.filepath)
 
-    def isDeveloperToken(self, token, sandbox=True):
+        try:
+            self.getUserOption('developer_token')
+        except:
+            user_config = ConfigParser.RawConfigParser()
+            user_config.add_section(sys_config.application_name)
+            user_config.set(sys_config.application_name, 'developer_token')
+            user_config.set(sys_config.application_name, 'notebook')
+            with open(self.filepath, 'wb') as configfile:
+                user_config.write(configfile)
+                os.chmod(self.filepath, 0600)
+            self.user_config.read(self.filepath)
+
+    def getUserOption(self, option):
+        return self.user_config.get(sys_config.application_name, option)
+
+    def setDeveloperToken(self):
+        print(textui.colored.green('Get Evernote DeveloperToken --> ' + sys_config.token_geturl))
+        while True:
+            developer_token = raw_input('Token: ')
+            if self.isDeveloperToken(developer_token, sys_config.token_sandbox):
+                self.user_config.set(sys_config.application_name, 'developer_token', developer_token)
+                return self
+
+    def setDefaultNotebook(self):
+        print(textui.colored.green('Set ToEver Default Post Notebook'))
+        notebook = raw_input('Notebook: ')
+        self.user_config.set(sys_config.application_name, 'notebook', notebook)
+        return self
+
+    def save(self):
+        self.user_config.write(open(self.filepath, 'w'))
+
+    @staticmethod
+    def isDeveloperToken(token, sandbox=True):
         try:
             EvernoteClient(token=token, sandbox=sandbox).get_note_store()
         except:
@@ -105,15 +127,22 @@ class Util():
 
 
 def main():
-    parser = argparse.ArgumentParser(description=config.application_name + ' version ' + config.version)
+    parser = argparse.ArgumentParser(description=sys_config.application_name + ' version ' + sys_config.version)
     parser.add_argument('file', nargs='?', action='store', help='file to send to evernote')
     parser.add_argument('-t', '--title', type=str, help='note title (omitted, the time is inputted automatically.)')
     parser.add_argument('-f', '--filename', type=str, help='note attachment file name')
     parser.add_argument('--tags', type=str, help='note tags (multiple tag separated by comma.)')
     parser.add_argument('--notebook', type=str, help='note notebook')
-    parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + config.version)
+    parser.add_argument('--config', action='store_true', help='set user config')
+    parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + sys_config.version)
 
     args = parser.parse_args()
+    user_config = UserConfig(sys_config.token_filepass)
+
+    # Set user config
+    if args.config:
+        user_config.setDeveloperToken().setDefaultNotebook().save()
+        return 0
 
     # File check
     if not args.file is None:
@@ -135,25 +164,27 @@ def main():
         note_tags = args.tags.split(',')
 
     # Get user developer token
-    auth = Auth()
     stdin_dafault = sys.stdin
     sys.stdin = open('/dev/tty', 'rt')
 
     try:
         while True:
-            developer_token = auth.getDeveloperToken(config.token_filepass)
-            if auth.isDeveloperToken(developer_token, config.token_sandbox):
+            if user_config.isDeveloperToken(user_config.getUserOption('developer_token'), sys_config.token_sandbox):
                 break
-            developer_token = auth.setDeveloperToken(config.token_filepass)
+            user_config.setDeveloperToken().save()
     except:
         return 1
 
     sys.stdin = stdin_dafault
 
-    toever = Toever(developer_token, config.token_sandbox)
+    toever = Toever(user_config.getUserOption('developer_token'), sys_config.token_sandbox)
 
     # Set note bookguid
     note_bookguid = None
+
+    if args.notebook is None and user_config.getUserOption('notebook'):
+        args.notebook = user_config.getUserOption('notebook')
+
     if not args.notebook is None:
         for line in toever.listNotebooks():
             if line.name == args.notebook:
