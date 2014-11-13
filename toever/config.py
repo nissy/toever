@@ -4,10 +4,10 @@
 import os
 
 application_name = 'toever'
-version = '1.6'
+version = '1.6.1'
 
+user_filepath = os.environ['HOME'] + '/.' + application_name
 token_sandbox = False
-token_filepass = os.environ['HOME'] + '/.' + application_name
 token_geturl = 'https://www.evernote.com/api/DeveloperToken.action'
 
 if token_sandbox:

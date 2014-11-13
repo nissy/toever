@@ -7,7 +7,7 @@ if sys.version_info < (2, 7):
     install_requires.append('argparse')
 
 setup(name='toever',
-      version='1.6',
+      version='1.6.1',
       description='Evernote command line tool',
       author='Yoshihiko Nishida',
       author_email='nishida@ngc224.org',

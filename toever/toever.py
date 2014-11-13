@@ -70,7 +70,7 @@ class UserConfig():
         self.user_config = ConfigParser.SafeConfigParser()
         try:
             self.user_config.read(self.filepath)
-            self.getUserOption('developer_token')
+            self.getUserOption('developer_token')  # Required Option
         except:
             user_config = ConfigParser.RawConfigParser()
             user_config.add_section(sys_config.application_name)
@@ -83,7 +83,8 @@ class UserConfig():
             self.user_config.read(self.filepath)
 
     def getUserOption(self, option):
-        return self.user_config.get(sys_config.application_name, option)
+        if self.user_config.has_option(sys_config.application_name, option):
+            return self.user_config.get(sys_config.application_name, option)
 
     def setDeveloperToken(self):
         print(textui.colored.green('Get Evernote developer token --> ' + sys_config.token_geturl))
@@ -143,7 +144,7 @@ def main():
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + sys_config.version)
 
     args = parser.parse_args()
-    user_config = UserConfig(sys_config.token_filepass)
+    user_config = UserConfig(sys_config.user_filepath)
 
     # Set user config
     if args.config:
