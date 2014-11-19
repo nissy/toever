@@ -9,6 +9,7 @@ from xml.sax.saxutils import escape
 from clint import textui
 import sys, os, argparse, mimetypes, hashlib, ConfigParser
 from datetime import datetime
+import keyring, platform
 import config as sys_config
 
 
@@ -69,18 +70,17 @@ class UserConfig():
         self.filepath = filepath
         self.user_config = ConfigParser.SafeConfigParser()
         try:
-            self.user_config.read(self.filepath)
-            self.getUserOption('developer_token')  # Required Option
+            if not os.path.isfile(self.filepath):
+                raise IOError(self.filepath)
         except:
             user_config = ConfigParser.RawConfigParser()
             user_config.add_section(sys_config.application_name)
-            user_config.set(sys_config.application_name, 'developer_token', '')
             user_config.set(sys_config.application_name, 'notebook', '')
             user_config.set(sys_config.application_name, 'tags', '')
             with open(self.filepath, 'wb') as configfile:
                 user_config.write(configfile)
-                os.chmod(self.filepath, 0600)
-            self.user_config.read(self.filepath)
+                os.chmod(self.filepath, 0644)
+        self.user_config.read(self.filepath)
 
     def getUserOption(self, option):
         if self.user_config.has_option(sys_config.application_name, option):
@@ -91,7 +91,7 @@ class UserConfig():
         while True:
             developer_token = raw_input('Token: ')
             if self.isDeveloperToken(developer_token, sys_config.token_sandbox):
-                self.user_config.set(sys_config.application_name, 'developer_token', developer_token)
+                keyring.set_password(sys_config.application_name, 'developer_token', developer_token)
                 return self
 
     def setDefaultNotebook(self):
@@ -148,7 +148,11 @@ def main():
 
     # Set user config
     if args.config:
-        user_config.setDeveloperToken().setDefaultNotebook().setDefaultTags().save()
+        try:
+            user_config.setDeveloperToken().setDefaultNotebook().setDefaultTags().save()
+        except:
+            return 1
+
         return 0
 
     # File check
@@ -178,12 +182,12 @@ def main():
     stdin_dafault = sys.stdin
     sys.stdin = open('/dev/tty', 'rt')
 
-    if not user_config.isDeveloperToken(user_config.getUserOption('developer_token'), sys_config.token_sandbox):
-        user_config.setDeveloperToken().save()
+    if not user_config.isDeveloperToken(keyring.get_password(sys_config.application_name, 'developer_token'), sys_config.token_sandbox):
+        user_config.setDeveloperToken()
 
     sys.stdin = stdin_dafault
 
-    toever = ToEver(user_config.getUserOption('developer_token'), sys_config.token_sandbox)
+    toever = ToEver(keyring.get_password(sys_config.application_name, 'developer_token'), sys_config.token_sandbox)
 
     # Set note bookguid
     note_bookguid = None

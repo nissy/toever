@@ -59,6 +59,3 @@ Help
       --notebook NOTEBOOK   note notebook
       --config              set user config
       -v, --version         show program's version number and exit
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/ngc224/toever/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-

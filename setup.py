@@ -1,13 +1,13 @@
 from setuptools import setup, find_packages
 import sys
 
-install_requires = ['evernote', 'clint']
+install_requires = ['evernote', 'clint', 'keyring']
 
 if sys.version_info < (2, 7):
     install_requires.append('argparse')
 
 setup(name='toever',
-      version='1.6.1',
+      version='1.7.0',
       description='Evernote command line tool',
       author='Yoshihiko Nishida',
       author_email='nishida@ngc224.org',

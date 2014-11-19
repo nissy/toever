@@ -4,7 +4,7 @@
 import os
 
 application_name = 'toever'
-version = '1.6.1'
+version = '1.7.0'
 
 user_filepath = os.environ['HOME'] + '/.' + application_name
 token_sandbox = False
