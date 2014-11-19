@@ -9,7 +9,7 @@ from xml.sax.saxutils import escape
 from clint import textui
 import sys, os, argparse, mimetypes, hashlib, ConfigParser
 from datetime import datetime
-import keyring, platform
+import keyring
 import config as sys_config
 
 

@@ -11,6 +11,8 @@ Install
 
 Setup
 -----
+OSX have saved the token to keychain
+
     $ toever --config
 
 Usage
