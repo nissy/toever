@@ -66,5 +66,6 @@ Help
                             note attachment file name
       --tags TAGS           note tags (multiple tag separated by comma.)
       --notebook NOTEBOOK   note notebook
+      --share               get create note share url
       --config              set user config
       -v, --version         show program's version number and exit
