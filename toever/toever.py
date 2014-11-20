@@ -19,10 +19,9 @@ class ToEver():
         self.client = EvernoteClient(token=self.token, sandbox=sandbox)
 
     def createNote(self, title, content, share=False, tag=None, bookguid=None, resource=None):
+        user_store = self.client.get_user_store()
+        note_store = self.client.get_note_store()
         try:
-            user_store = self.client.get_user_store()
-            note_store = self.client.get_note_store()
-
             note = Note()
             if not tag is None:
                 note.tagNames = tag
@@ -35,33 +34,16 @@ class ToEver():
             note.content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
             note.content += "<!DOCTYPE en-note SYSTEM \"http://xml.evernote.com/pub/enml2.dtd\">"
             note.content += "<en-note>%s</en-note>" % content
-
             created_note = note_store.createNote(note)
-
-            if share:
-                note_share_url = "%s/shard/%s/sh/%s/%s" % \
-                                 (
-                                     sys_config.evernote_url,
-                                     user_store.getUser().shardId,
-                                     created_note.guid,
-                                     note_store.shareNote(self.token, created_note.guid)
-                                 )
-
-            upload_limit_next_month = user_store.getUser().accounting.uploadLimitNextMonth
-            user_upload = note_store.getSyncState().uploaded
-            user_upload_state = "%s MB / %s MB" % \
-                                (
-                                    self.roundMbSize(user_upload),
-                                    self.roundMbSize(upload_limit_next_month)
-                                )
         except:
-            print "\n" + user_upload_state + "\n" + textui.colored.red('Create note error')
+            print "\n" + textui.colored.red('Create note error')
             return 1
-        print "\n" + user_upload_state + "\n" + textui.colored.blue("Created note title is '" + title + "'")
-
+        print "\n" + ToEver.getUserUploadState(note_store.getSyncState().uploaded, user_store.getUser().accounting.uploadLimitNextMonth)
+        print textui.colored.blue("Created note title is '" + title + "'")
         if share:
-            print textui.colored.blue("Get note share url --> " + note_share_url)
-
+            print textui.colored.blue(
+                "Get note share url --> " + ToEver.getNoteShareUrl(sys_config.evernote_url, user_store.getUser().shardId, created_note.guid, note_store.shareNote(self.token, created_note.guid))
+            )
         return 0
 
     def listNotebooks(self):
@@ -82,8 +64,16 @@ class ToEver():
         return len(data.replace('<div><br/></div>', '')) != 0
 
     @staticmethod
-    def roundMbSize(size):
+    def getNoteShareUrl(url, shard_id, note_guid, share_key):
+        return "%s/shard/%s/sh/%s/%s" % (url, shard_id, note_guid, share_key)
+
+    @staticmethod
+    def getRoundMbSize(size):
         return str(round(size / (1024.0 ** 2)))
+
+    @staticmethod
+    def getUserUploadState(user_upload, upload_limit_next_month):
+        return "%s MB / %s MB" % (ToEver.getRoundMbSize(user_upload), ToEver.getRoundMbSize(upload_limit_next_month))
 
 
 class UserConfig():
@@ -238,7 +228,7 @@ def main():
         attr = ResourceAttributes()
         attr.fileName = args.filename
         resource.attributes = attr
-        return toever.createNote(note_title, note_content, note_tags, note_bookguid, resource)
+        return toever.createNote(note_title, note_content, args.share, note_tags, note_bookguid, resource)
 
     # Set text stream
     try:
