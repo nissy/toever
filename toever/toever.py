@@ -15,11 +15,14 @@ import config as sys_config
 
 class ToEver():
     def __init__(self, token, sandbox=True):
-        self.client = EvernoteClient(token=token, sandbox=sandbox)
+        self.token = token
+        self.client = EvernoteClient(token=self.token, sandbox=sandbox)
 
-    def createNote(self, title, content, tag=None, bookguid=None, resource=None):
+    def createNote(self, title, content, share=False, tag=None, bookguid=None, resource=None):
         try:
+            user_store = self.client.get_user_store()
             note_store = self.client.get_note_store()
+
             note = Note()
             if not tag is None:
                 note.tagNames = tag
@@ -32,15 +35,33 @@ class ToEver():
             note.content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
             note.content += "<!DOCTYPE en-note SYSTEM \"http://xml.evernote.com/pub/enml2.dtd\">"
             note.content += "<en-note>%s</en-note>" % content
-            note_store.createNote(note)
-            upload_limit_next_month = self.client.get_user_store().getUser().accounting.uploadLimitNextMonth
+
+            created_note = note_store.createNote(note)
+
+            if share:
+                note_share_url = "%s/shard/%s/sh/%s/%s" % \
+                                 (
+                                     sys_config.evernote_url,
+                                     user_store.getUser().shardId,
+                                     created_note.guid,
+                                     note_store.shareNote(self.token, created_note.guid)
+                                 )
+
+            upload_limit_next_month = user_store.getUser().accounting.uploadLimitNextMonth
             user_upload = note_store.getSyncState().uploaded
-            user_upload_state = "%s MB / %s MB" % (
-                self.roundMbSize(user_upload), self.roundMbSize(upload_limit_next_month))
+            user_upload_state = "%s MB / %s MB" % \
+                                (
+                                    self.roundMbSize(user_upload),
+                                    self.roundMbSize(upload_limit_next_month)
+                                )
         except:
             print "\n" + user_upload_state + "\n" + textui.colored.red('Create note error')
             return 1
         print "\n" + user_upload_state + "\n" + textui.colored.blue("Created note title is '" + title + "'")
+
+        if share:
+            print textui.colored.blue("Get note share url --> " + note_share_url)
+
         return 0
 
     def listNotebooks(self):
@@ -90,7 +111,7 @@ class UserConfig():
         print(textui.colored.green('Get Evernote developer token --> ' + sys_config.token_geturl))
         while True:
             developer_token = raw_input('Token: ')
-            if self.isDeveloperToken(developer_token, sys_config.token_sandbox):
+            if self.isDeveloperToken(developer_token, sys_config.sandbox):
                 keyring.set_password(sys_config.application_name, 'developer_token', developer_token)
                 return self
 
@@ -140,6 +161,7 @@ def main():
     parser.add_argument('-f', '--filename', type=str, help='note attachment file name')
     parser.add_argument('--tags', type=str, help='note tags (multiple tag separated by comma.)')
     parser.add_argument('--notebook', type=str, help='note notebook')
+    parser.add_argument('--share', action='store_true', help='get create note share url')
     parser.add_argument('--config', action='store_true', help='set user config')
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + sys_config.version)
 
@@ -182,12 +204,12 @@ def main():
     stdin_dafault = sys.stdin
     sys.stdin = open('/dev/tty', 'rt')
 
-    if not user_config.isDeveloperToken(keyring.get_password(sys_config.application_name, 'developer_token'), sys_config.token_sandbox):
+    if not user_config.isDeveloperToken(keyring.get_password(sys_config.application_name, 'developer_token'), sys_config.sandbox):
         user_config.setDeveloperToken()
 
     sys.stdin = stdin_dafault
 
-    toever = ToEver(keyring.get_password(sys_config.application_name, 'developer_token'), sys_config.token_sandbox)
+    toever = ToEver(keyring.get_password(sys_config.application_name, 'developer_token'), sys_config.sandbox)
 
     # Set note bookguid
     note_bookguid = None
@@ -228,7 +250,7 @@ def main():
     finally:
         # create note
         if toever.isSetContent(note_content):
-            return toever.createNote(note_title, note_content, note_tags, note_bookguid)
+            return toever.createNote(note_title, note_content, args.share, note_tags, note_bookguid)
     return 1
 
 
