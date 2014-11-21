@@ -164,7 +164,6 @@ def main():
             user_config.setDeveloperToken().setDefaultNotebook().setDefaultTags().save()
         except:
             return 1
-
         return 0
 
     # File check

@@ -1,9 +1,16 @@
 toever
 =======
+toEver is a command-line tool to create a note to Evernote.   
 
-About
------
-Evernote command line tool.
+This command is specializing in the function to transmit a file and to make a note.  
+The file of all the kinds can be transmitted.  
+A binary file is registered as an attached file.   
+
+A text and a binary file can be registered also from standard input.  
+Standard input corresponds to the command which cannot be ended unless "tail -f" etc. send a signal.   
+
+A tag, a notebook, and a title can be attached as an option, or a share link can be acquired.  
+
 
 Install
 -----
@@ -11,7 +18,7 @@ Install
 
 Setup
 -----
-OSX have saved the token to keychain
+OSX have saved the token to Keychain
 
     $ toever --config
 
@@ -19,11 +26,11 @@ Usage
 -----
 File to send to evernote
 
-    $ toever ~/aaa.txt
+    $ toever aaa.txt
 
     $ toever /etc/hosts -t 'My Hosts File'
 
-    $ toever ~/photo.jpg --notebook 'photo'
+    $ toever photo.jpg --notebook 'photo'
     
 The note of evernote will be created if standard input is passed to toever.
 
@@ -35,7 +42,7 @@ The note of evernote will be created if standard input is passed to toever.
 
 If you specify a file name in the option, it is saved as an attachment.
 
-    $ cat ~/photo.jpg | toever -f photo.jpg
+    $ cat photo.jpg | toever -f photo.jpg
 
     $ curl https://www.python.org/static/img/python-logo.png | toever -f python.png --tags python
 
@@ -51,8 +58,8 @@ It is possible to acquire a share URL If you add the "--share" option
 Help
 -----
     usage: toever [-h] [-t TITLE] [-f FILENAME] [--tags TAGS]
-                     [--notebook NOTEBOOK] [--config] [-v]
-                     [file]
+                  [--notebook NOTEBOOK] [--share] [--config] [-v]
+                  [file]
     
     positional arguments:
       file                  file to send to evernote
