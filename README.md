@@ -16,6 +16,11 @@ Install
 -----
     $ sudo pip install toever
 
+Install Mac OSX
+-----
+    $ brew tap ngc224/toever
+    $ brew install toever
+
 Setup
 -----
 [Please get the developer token of evernote](https://www.evernote.com/api/DeveloperToken.action)   
