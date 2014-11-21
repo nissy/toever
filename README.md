@@ -18,8 +18,8 @@ Install
 
 Setup
 -----
-[Please get the Developer token of evernote](https://www.evernote.com/api/DeveloperToken.action)   
-OSX have saved the token to Keychain  
+[Please get the developer token of evernote](https://www.evernote.com/api/DeveloperToken.action)   
+OSX have saved the token to keychain  
 
     $ toever --config
 
