@@ -18,7 +18,7 @@ class ToEver():
         self.token = token
         self.client = EvernoteClient(token=self.token, sandbox=sandbox)
 
-    def createNote(self, title, content, share=False, tag=None, bookguid=None, resource=None):
+    def createNote(self, title, content, hide=False, share=False, tag=None, bookguid=None, resource=None):
         user_store = self.client.get_user_store()
         note_store = self.client.get_note_store()
         try:
@@ -36,14 +36,16 @@ class ToEver():
             note.content += "<en-note>%s</en-note>" % content
             created_note = note_store.createNote(note)
         except:
-            print "\n" + textui.colored.red('Create note error')
-            return 1
-        print "\n" + ToEver.getUserUploadState(note_store.getSyncState().uploaded, user_store.getUser().accounting.uploadLimitNextMonth)
-        print textui.colored.blue("Created note title is '" + title + "'")
-        if share:
-            print textui.colored.blue(
-                "Get note share url --> " + ToEver.getNoteShareUrl(sys_config.evernote_url, user_store.getUser().shardId, created_note.guid, note_store.shareNote(self.token, created_note.guid))
-            )
+            return textui.colored.red('Create note error')
+        if not hide:
+            print "\n" + textui.colored.blue(ToEver.getUserUploadState(note_store.getSyncState().uploaded, user_store.getUser().accounting.uploadLimitNextMonth))
+            print textui.colored.blue("Created note title is '" + title + "'")
+            if share:
+                print textui.colored.blue(
+                    "Get note share url --> " + ToEver.getNoteShareUrl(sys_config.evernote_url, user_store.getUser().shardId, created_note.guid, note_store.shareNote(self.token, created_note.guid))
+                )
+        elif share:
+            print textui.colored.blue(ToEver.getNoteShareUrl(sys_config.evernote_url, user_store.getUser().shardId, created_note.guid, note_store.shareNote(self.token, created_note.guid)))
         return 0
 
     def listNotebooks(self):
@@ -125,7 +127,7 @@ class UserConfig():
         try:
             EvernoteClient(token=token, sandbox=sandbox).get_note_store()
         except:
-            print(textui.colored.red('Token can not be used'))
+            print textui.colored.red('Token can not be used')
             return False
         return True
 
@@ -152,6 +154,7 @@ def main():
     parser.add_argument('--tags', type=str, help='note tags (multiple tag separated by comma.)')
     parser.add_argument('--notebook', type=str, help='note notebook')
     parser.add_argument('--share', action='store_true', help='get create note share url')
+    parser.add_argument('--hide', action='store_true', help='hide the display')
     parser.add_argument('--config', action='store_true', help='set user config')
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + sys_config.version)
 
@@ -169,8 +172,7 @@ def main():
     # File check
     if not args.file is None:
         if not os.path.isfile(args.file):
-            print(textui.colored.red('File does not exist ' + args.file))
-            return 1
+            return textui.colored.red('File does not exist ' + args.file)
         sys.stdin = open(args.file, 'r')
         if Util.isBinary(open(args.file, 'r').read()) and args.filename is None:
             args.filename = args.file
@@ -227,20 +229,23 @@ def main():
         attr = ResourceAttributes()
         attr.fileName = args.filename
         resource.attributes = attr
-        return toever.createNote(note_title, note_content, args.share, note_tags, note_bookguid, resource)
+        if not args.hide:
+            print textui.colored.green("Attachment file is " + attr.fileName)
+        return toever.createNote(note_title, note_content, args.hide, args.share, note_tags, note_bookguid, resource)
 
     # Set text stream
     try:
         for line in iter(sys.stdin.readline, ''):
             note_content += toever.getContentFormat(line)
-            print(textui.colored.green(line.rstrip()))
+            if not args.hide:
+                print textui.colored.green(line.rstrip())
     except:
         pass
     finally:
         # create note
         if toever.isSetContent(note_content):
-            return toever.createNote(note_title, note_content, args.share, note_tags, note_bookguid)
-    return 1
+            return toever.createNote(note_title, note_content, args.hide, args.share, note_tags, note_bookguid)
+    return textui.colored.red('Create note error')
 
 
 if __name__ == "__main__":
