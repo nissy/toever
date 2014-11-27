@@ -1,4 +1,4 @@
-toever
+toEver
 =======
 toEver is a command-line tool to create a note to Evernote.   
 
@@ -64,8 +64,8 @@ It is possible to acquire a share URL If you add the "--share" option
 Help
 -----
     usage: toever [-h] [-t TITLE] [-f FILENAME] [--tags TAGS]
-                  [--notebook NOTEBOOK] [--share] [--config] [-v]
-                  [file]
+                     [--notebook NOTEBOOK] [--share] [--hide] [--config] [-v]
+                     [file]
     
     positional arguments:
       file                  file to send to evernote
@@ -80,5 +80,6 @@ Help
       --tags TAGS           note tags (multiple tag separated by comma.)
       --notebook NOTEBOOK   note notebook
       --share               get create note share url
+      --hide                hide the display
       --config              set user config
       -v, --version         show program's version number and exit

@@ -39,14 +39,24 @@ class ToEver():
             created_note = note_store.createNote(note)
         except:
             return textui.colored.red('Create note error')
+
+        note_share_url = None
+        if self.share:
+            note_share_url = ToEver.getNoteShareUrl(
+                sys_config.evernote_url,
+                user_store.getUser().shardId,
+                created_note.guid,
+                note_store.shareNote(self.token, created_note.guid)
+            )
+
         if not self.hide:
             message = "\n" + ToEver.getUserUploadState(note_store.getSyncState().uploaded, user_store.getUser().accounting.uploadLimitNextMonth)
             message += "\n" + "Created note title is '" + title + "'"
-            if self.share:
-                message += "\n" + "Get note share url --> " + ToEver.getNoteShareUrl(sys_config.evernote_url, user_store.getUser().shardId, created_note.guid, note_store.shareNote(self.token, created_note.guid))
+            if note_share_url is not None:
+                message += "\n" + "Share URL --> " + note_share_url
             print(textui.colored.blue(message))
-        elif self.share:
-            print(textui.colored.blue(ToEver.getNoteShareUrl(sys_config.evernote_url, user_store.getUser().shardId, created_note.guid, note_store.shareNote(self.token, created_note.guid))))
+        elif note_share_url is not None:
+            print(textui.colored.blue(note_share_url))
         return 0
 
     def listNotebooks(self):
@@ -109,13 +119,13 @@ class UserConfig():
                 return self
 
     def setDefaultNotebook(self):
-        print(textui.colored.green('Set ToEver default post notebook / Not enter if you do not set'))
+        print(textui.colored.green('Set toEver default post notebook / Not enter if you do not set'))
         notebook = raw_input('Notebook: ')
         self.user_config.set(sys_config.application_name, 'notebook', notebook)
         return self
 
     def setDefaultTags(self):
-        print(textui.colored.green('Set ToEver default post tags / Not enter if you do not set'))
+        print(textui.colored.green('Set toEver default post tags / Not enter if you do not set'))
         tags = raw_input('Tags: ')
         self.user_config.set(sys_config.application_name, 'tags', tags)
         return self
@@ -154,7 +164,7 @@ def main():
     parser.add_argument('-f', '--filename', type=str, help='note attachment file name')
     parser.add_argument('--tags', type=str, help='note tags (multiple tag separated by comma.)')
     parser.add_argument('--notebook', type=str, help='note notebook')
-    parser.add_argument('--share', action='store_true', help='get create note share url')
+    parser.add_argument('--share', action='store_true', help='get note share url')
     parser.add_argument('--hide', action='store_true', help='hide the display')
     parser.add_argument('--config', action='store_true', help='set user config')
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + sys_config.version)
@@ -171,12 +181,12 @@ def main():
         return 0
 
     # File check
-    if not args.file is None:
+    if args.file is not None:
         if not os.path.isfile(args.file):
             return textui.colored.red('File does not exist ' + args.file)
         sys.stdin = open(args.file, 'r')
         if Util.isBinary(open(args.file, 'r').read()) and args.filename is None:
-            args.filename = args.file
+            args.filename = os.path.basename(args.file)
 
     # Get user developer token
     stdin_dafault = sys.stdin
@@ -189,7 +199,7 @@ def main():
 
     # Get note title
     if args.title is None:
-        args.title = 'ToEver Post ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        args.title = 'toEver Post ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     # Get note tags
     if args.tags is None and user_config.getUserOption('tags'):
@@ -214,7 +224,7 @@ def main():
     note_content = str()
 
     # Set binary stream
-    if not args.filename is None:
+    if args.filename is not None:
         data = Data()
         data.body = sys.stdin.read()
         data.size = len(data.body)
@@ -226,7 +236,7 @@ def main():
         attr.fileName = args.filename
         resource.attributes = attr
         if not args.hide:
-            print(textui.colored.green("Attachment file is " + attr.fileName))
+            print(textui.colored.green("Attachment file is '" + attr.fileName + "'"))
         return toever.createNote(args.title, note_content, resource)
 
     # Set text stream
