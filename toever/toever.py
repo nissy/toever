@@ -6,10 +6,11 @@ from evernote.edam.type.ttypes import Note
 from evernote.edam.type.ttypes import Resource, ResourceAttributes, Data
 # from evernote.edam.error import ttypes as errors
 from xml.sax.saxutils import escape
+from datetime import datetime
 from clint import textui
 import sys, os, argparse, mimetypes, hashlib, ConfigParser
-from datetime import datetime
 import keyring
+import chardet
 import config as sys_config
 
 
@@ -146,15 +147,7 @@ class UserConfig():
 class Util():
     @staticmethod
     def isBinary(data):
-        for encoding in ['utf-8', 'shift-jis', 'euc-jp', 'iso2022-jp']:
-            try:
-                data = data.decode(encoding)
-                break
-            except:
-                pass
-        if isinstance(data, unicode):
-            return False
-        return True
+        return chardet.detect(data)['encoding'] is None
 
 
 def main():

@@ -46,18 +46,18 @@ The note of evernote will be created if standard input is passed to toever.
     $ tail -f /var/log/access_log | toever
 
 If you specify a file name in the option, it is saved as an attachment.
+ 
+    $ tar cvz /etc/nginx | toever -f nginx.tar.gz
 
-    $ cat photo.jpg | toever -f photo.jpg
-
-    $ curl https://www.python.org/static/img/python-logo.png | toever -f python.png --tags python
+    $ curl https://www.python.org/static/img/python-logo.png | toever -f python.png
 
     $ wget -O - https://github.com/ngc224/toever/archive/master.tar.gz | toever -f master.tar.gz
 
 It is possible to acquire a share URL If you add the "--share" option
 
-    $ toever aaa.txt --share
-
-    Created note title is 'ToEver Post 2014-11-20 21:19:16'
+    $ toever ~/.ssh/authorized_keys --share
+    ...
+    Created note title is 'toEver Post 2014-11-20 21:19:16' [50.0 MB / 4096.0 MB]
     Share URL --> https://www.evernote.com/shard/s143/sh/5f55f19e-d5f4-4131-95e8-81f0b0...
 
 Help

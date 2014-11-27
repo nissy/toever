@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import sys
 
-install_requires = ['evernote', 'clint', 'keyring']
+install_requires = ['evernote', 'clint', 'chardet', 'keyring']
 
 if sys.version_info < (2, 7):
     install_requires.append('argparse')
