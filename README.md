@@ -12,11 +12,11 @@ Standard input corresponds to the command which cannot be ended unless "tail -f"
 A tag, a notebook, and a title can be attached as an option, or a share link can be acquired.  
 
 
-Install
+Install Python pip
 -----
     $ sudo pip install toever
 
-Install Mac OSX
+Install Mac OSX Homebrew
 -----
     $ brew tap ngc224/toever
     $ brew install toever

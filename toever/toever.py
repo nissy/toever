@@ -50,8 +50,8 @@ class ToEver():
             )
 
         if not self.hide:
-            message = "\n" + ToEver.getUserUploadState(note_store.getSyncState().uploaded, user_store.getUser().accounting.uploadLimitNextMonth)
-            message += "\n" + "Created note title is '" + title + "'"
+            message = "\n" + "Created note title is '" + title + "'"
+            message += " [" + ToEver.getUserUploadState(note_store.getSyncState().uploaded, user_store.getUser().accounting.uploadLimitNextMonth) + "]"
             if note_share_url is not None:
                 message += "\n" + "Share URL --> " + note_share_url
             print(textui.colored.blue(message))
@@ -111,7 +111,7 @@ class UserConfig():
             return self.user_config.get(sys_config.application_name, option)
 
     def setDeveloperToken(self):
-        print(textui.colored.green('Get Evernote developer token --> ' + sys_config.token_geturl))
+        print(textui.colored.green('Get Evernote DeveloperToken URL --> ' + sys_config.token_geturl))
         while True:
             developer_token = raw_input('Token: ')
             if self.isDeveloperToken(developer_token, sys_config.sandbox):
