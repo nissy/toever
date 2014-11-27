@@ -42,6 +42,7 @@ class ToEver():
             return textui.colored.red('Create note error')
 
         note_share_url = None
+        note_share_resource_url = None
         if self.share:
             note_share_url = ToEver.getNoteShareUrl(
                 sys_config.evernote_url,
@@ -49,12 +50,17 @@ class ToEver():
                 created_note.guid,
                 note_store.shareNote(self.token, created_note.guid)
             )
+            if resource is not None:
+                for x in created_note.resources:
+                    note_share_resource_url = note_share_url + "/res/%s/%s" % (x.guid, x.attributes.fileName)
 
         if not self.hide:
             message = "\n" + "Created note title is '" + title + "'"
             message += " [" + ToEver.getUserUploadState(note_store.getSyncState().uploaded, user_store.getUser().accounting.uploadLimitNextMonth) + "]"
             if note_share_url is not None:
                 message += "\n" + "Share URL --> " + note_share_url
+                if note_share_resource_url is not None:
+                    message += "\n" + "Share attachment URL --> " + note_share_resource_url
             print(textui.colored.blue(message))
         elif note_share_url is not None:
             print(textui.colored.blue(note_share_url))
