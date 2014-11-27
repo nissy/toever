@@ -59,7 +59,7 @@ It is possible to acquire a share URL If you add the "--share" option
     $ toever aaa.txt --share
 
     Created note title is 'ToEver Post 2014-11-20 21:19:16'
-    Get note share url --> https://www.evernote.com/shard/s143/sh/5f55f19e-d5f4-4131-95e8-81f0b0...
+    Share URL --> https://www.evernote.com/shard/s143/sh/5f55f19e-d5f4-4131-95e8-81f0b0...
 
 Help
 -----
