@@ -58,9 +58,9 @@ class ToEver():
             message = "\n" + "Created note title is '" + title + "'"
             message += " [" + ToEver.getUserUploadState(note_store.getSyncState().uploaded, user_store.getUser().accounting.uploadLimitNextMonth) + "]"
             if note_share_url is not None:
-                message += "\n" + "Share URL --> " + note_share_url
+                message += "\n" + "share link --> " + note_share_url
                 if note_share_resource_url is not None:
-                    message += "\n" + "Share attachment URL --> " + note_share_resource_url
+                    message += "\n" + "share attachment link --> " + note_share_resource_url
             print(textui.colored.blue(message))
         elif note_share_url is not None:
             print(textui.colored.blue(note_share_url))
@@ -159,12 +159,12 @@ class Util():
 def main():
     parser = argparse.ArgumentParser(description=sys_config.application_name + ' version ' + sys_config.version)
     parser.add_argument('file', nargs='?', action='store', help='file to send to evernote')
-    parser.add_argument('-t', '--title', type=str, help='note title (omitted, the time is inputted automatically.)')
-    parser.add_argument('-f', '--filename', type=str, help='note attachment file name')
-    parser.add_argument('--tags', type=str, help='note tags (multiple tag separated by comma.)')
-    parser.add_argument('--notebook', type=str, help='note notebook')
-    parser.add_argument('--share', action='store_true', help='get note share url')
-    parser.add_argument('--hide', action='store_true', help='hide the display')
+    parser.add_argument('-t', '--title', type=str, help='set note title (omitted, the time is inputted automatically.)')
+    parser.add_argument('-f', '--filename', type=str, help='set note attachment file name (When the name is designated, it processed as attachment file.)')
+    parser.add_argument('--tags', type=str, help='set note tags (multiple tag separated by comma.)')
+    parser.add_argument('--notebook', type=str, help='set note notebook')
+    parser.add_argument('--share', action='store_true', help='set note share link')
+    parser.add_argument('--hide', action='store_true', help='hide the display message (except share link)')
     parser.add_argument('--config', action='store_true', help='set user config')
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + sys_config.version)
 

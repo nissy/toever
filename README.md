@@ -58,7 +58,7 @@ It is possible to acquire a share URL If you add the "--share" option
     $ toever ~/.ssh/authorized_keys --share
     ...
     Created note title is 'toEver Post 2014-11-20 21:19:16' [50.0 MB / 4096.0 MB]
-    Share URL --> https://www.evernote.com/shard/s143/sh/5f55f19e-d5f4-4131-95e8-81f0b0...
+    share link --> https://www.evernote.com/shard/s143/sh/5f55f19e-d5f4-4131-95e8-81f0b0...
 
 Help
 -----
@@ -72,13 +72,15 @@ Help
     optional arguments:
       -h, --help            show this help message and exit
       -t TITLE, --title TITLE
-                            note title (omitted, the time is inputted
+                            set note title (omitted, the time is inputted
                             automatically.)
       -f FILENAME, --filename FILENAME
-                            note attachment file name
-      --tags TAGS           note tags (multiple tag separated by comma.)
-      --notebook NOTEBOOK   note notebook
-      --share               get create note share url
-      --hide                hide the display
+                            set note attachment file name (When the name is
+                            designated, it processed as attachment file.)
+      --tags TAGS           set note tags (multiple tag separated by comma.)
+      --notebook NOTEBOOK   set note notebook
+      --share               set note share link
+      --hide                hide the display message (except share link)
       --config              set user config
       -v, --version         show program's version number and exit
+
