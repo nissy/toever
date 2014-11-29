@@ -4,7 +4,7 @@
 import os
 
 application_name = 'toever'
-version = '1.8.9'
+version = '1.9.0'
 
 user_filepath = os.environ['HOME'] + '/.' + application_name
 sandbox = False
