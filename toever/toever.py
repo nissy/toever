@@ -209,8 +209,9 @@ def main():
 
     toever = ToEver(keyring.get_password(sys_config.application_name, 'developer_token'), sys_config.sandbox)
 
+    note_title = args.title
     if args.title is None:
-        args.title = 'toEver Post ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        note_title = 'toEver Post ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     if args.tags is None and user_config.getUserOption('tags'):
         args.tags = user_config.getUserOption('tags')
@@ -233,23 +234,26 @@ def main():
             if filepath is not None:
                 if not os.path.isfile(filepath):
                     return textui.colored.red('File does not exist ' + filepath)
-                sys.stdin = open(filepath, 'r')
+                toever.content = str()
                 resource = None
+                filename = os.path.basename(filepath)
+                sys.stdin = open(filepath, 'r')
                 if Util.isBinary(open(filepath, 'r').read()) and args.filename is None:
-                    filename = os.path.basename(filepath)
                     resource = toever.getResource(filename)
                     if not toever.hide:
                         print(textui.colored.green("Attachment file is '" + filename + "'"))
                 else:
                     toever.setContent()
-                if not toever.createNote(args.title, resource):
+                if args.title is None:
+                    note_title = filename
+                if not toever.createNote(note_title, resource):
                     return textui.colored.red('Create note error')
         return 0
 
     if args.filename is not None:
         if not toever.hide:
             print(textui.colored.green("Attachment file is '" + args.filename + "'"))
-        if not toever.createNote(args.title, toever.getResource(args.filename)):
+        if not toever.createNote(note_title, toever.getResource(args.filename)):
             return textui.colored.red('Create note error')
         return 0
 
@@ -258,7 +262,7 @@ def main():
     except:
         pass
     finally:
-        if not toever.createNote(args.title):
+        if not toever.createNote(note_title):
             return textui.colored.red('Create note error')
     return 0
 

@@ -33,9 +33,9 @@ File to send to evernote
 
     $ toever aaa.txt
 
-    $ toever /etc/hosts -t 'My Hosts File'
+    $ toever aaa.txt bbb.txt ccc.txt
 
-    $ toever photo.jpg --notebook 'photo'
+    $ toever photo1.jpg photo2.jpg --notebook 'photo'
     
 The note of evernote will be created if standard input is passed to toever.
 
@@ -64,7 +64,7 @@ Help
 -----
     usage: toever [-h] [-t TITLE] [-f FILENAME] [--tags TAGS]
                      [--notebook NOTEBOOK] [--share] [--hide] [--config] [-v]
-                     [file]
+                     [file [file ...]]
     
     positional arguments:
       file                  file to send to evernote
@@ -83,4 +83,3 @@ Help
       --hide                hide the display message (except share link)
       --config              set user config
       -v, --version         show program's version number and exit
-
