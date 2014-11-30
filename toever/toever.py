@@ -246,6 +246,13 @@ def main():
                     return textui.colored.red('Create note error')
         return 0
 
+    if args.filename is not None:
+        if not toever.hide:
+            print(textui.colored.green("Attachment file is '" + args.filename + "'"))
+        if not toever.createNote(args.title, toever.getResource(args.filename)):
+            return textui.colored.red('Create note error')
+        return 0
+
     try:
         toever.setContent()
     except:
