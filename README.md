@@ -33,7 +33,7 @@ File to send to evernote
 
     $ toever aaa.txt
 
-    $ toever aaa.txt bbb.txt ccc.txt
+    $ toever aaa.txt bbb.jpg ccc.zip
 
     $ toever photo1.jpg photo2.jpg --notebook 'photo'
     
@@ -62,8 +62,8 @@ It is possible to acquire a share URL If you add the "--share" option
 
 Help
 -----
-    usage: toever [-h] [-t TITLE] [-f FILENAME] [--tags TAGS]
-                     [--notebook NOTEBOOK] [--share] [--hide] [--config] [-v]
+    usage: toever [-h] [-f FILENAME] [-t TITLE] [--tags TAGS]
+                     [--notebook NOTEBOOK] [--config] [--hide] [--share] [-v]
                      [file [file ...]]
     
     positional arguments:
@@ -71,15 +71,15 @@ Help
     
     optional arguments:
       -h, --help            show this help message and exit
-      -t TITLE, --title TITLE
-                            set note title (omitted, the time is inputted
-                            automatically.)
       -f FILENAME, --filename FILENAME
                             set note attachment file name (When the name is
                             designated, it processed as attachment file.)
+      -t TITLE, --title TITLE
+                            set note title (omitted, the time is inputted
+                            automatically.)
       --tags TAGS           set note tags (multiple tag separated by comma.)
       --notebook NOTEBOOK   set note notebook
-      --share               set note share link
-      --hide                hide the display message (except share link)
       --config              set user config
+      --hide                hide the display message (except share link)
+      --share               set note share link
       -v, --version         show program's version number and exit
