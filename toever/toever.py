@@ -118,6 +118,10 @@ class ToEver():
     def getUserUploadState(user_upload, upload_limit_next_month):
         return "%s MB / %s MB" % (ToEver.getRoundMbSize(user_upload), ToEver.getRoundMbSize(upload_limit_next_month))
 
+    @staticmethod
+    def getCreateNoteError():
+        return textui.colored.red('Create note error')
+
 
 class UserConfig():
     def __init__(self, filepath):
@@ -182,13 +186,13 @@ class Util():
 def main():
     parser = argparse.ArgumentParser(description=sys_config.application_name + ' version ' + sys_config.version)
     parser.add_argument('file', nargs='*', action='store', help='file to send to evernote')
-    parser.add_argument('-t', '--title', type=str, help='set note title (omitted, the time is inputted automatically.)')
     parser.add_argument('-f', '--filename', type=str, help='set note attachment file name (When the name is designated, it processed as attachment file.)')
+    parser.add_argument('-t', '--title', type=str, help='set note title (omitted, the time is inputted automatically.)')
     parser.add_argument('--tags', type=str, help='set note tags (multiple tag separated by comma.)')
     parser.add_argument('--notebook', type=str, help='set note notebook')
-    parser.add_argument('--share', action='store_true', help='set note share link')
-    parser.add_argument('--hide', action='store_true', help='hide the display message (except share link)')
     parser.add_argument('--config', action='store_true', help='set user config')
+    parser.add_argument('--hide', action='store_true', help='hide the display message (except share link)')
+    parser.add_argument('--share', action='store_true', help='set note share link')
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + sys_config.version)
 
     args = parser.parse_args()
@@ -231,30 +235,29 @@ def main():
 
     if len(args.file) > 0:
         for filepath in args.file:
-            if filepath is not None:
-                if not os.path.isfile(filepath):
-                    return textui.colored.red('File does not exist ' + filepath)
-                toever.content = str()
-                resource = None
-                filename = os.path.basename(filepath)
-                sys.stdin = open(filepath, 'r')
-                if Util.isBinary(open(filepath, 'r').read()) and args.filename is None:
-                    resource = toever.getResource(filename)
-                    if not toever.hide:
-                        print(textui.colored.green("Attachment file is '" + filename + "'"))
-                else:
-                    toever.setContent()
-                if args.title is None:
-                    note_title = filename
-                if not toever.createNote(note_title, resource):
-                    return textui.colored.red('Create note error')
+            if not os.path.isfile(filepath):
+                return textui.colored.red('File does not exist ' + filepath)
+            toever.content = str()
+            resource = None
+            filename = os.path.basename(filepath)
+            sys.stdin = open(filepath, 'r')
+            if Util.isBinary(open(filepath, 'r').read()):
+                resource = toever.getResource(filename)
+                if not toever.hide:
+                    print(textui.colored.green("Attachment file is '" + filename + "'"))
+            else:
+                toever.setContent()
+            if args.title is None:
+                note_title = filename
+            if not toever.createNote(note_title, resource):
+                return toever.getCreateNoteError()
         return 0
 
     if args.filename is not None:
         if not toever.hide:
             print(textui.colored.green("Attachment file is '" + args.filename + "'"))
         if not toever.createNote(note_title, toever.getResource(args.filename)):
-            return textui.colored.red('Create note error')
+            return toever.getCreateNoteError()
         return 0
 
     try:
@@ -263,7 +266,7 @@ def main():
         pass
     finally:
         if not toever.createNote(note_title):
-            return textui.colored.red('Create note error')
+            return toever.getCreateNoteError()
     return 0
 
 if __name__ == "__main__":
