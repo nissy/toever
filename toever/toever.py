@@ -8,7 +8,7 @@ from evernote.edam.type.ttypes import Resource, ResourceAttributes, Data
 from xml.sax.saxutils import escape
 from datetime import datetime
 from clint import textui
-import sys, os, argparse, mimetypes, hashlib, ConfigParser, copy
+import sys, os, argparse, mimetypes, hashlib, ConfigParser
 import keyring
 import chardet
 import config as sys_config
