@@ -8,9 +8,15 @@ from evernote.edam.type.ttypes import Resource, ResourceAttributes, Data
 from xml.sax.saxutils import escape
 from datetime import datetime
 from clint import textui
-import sys, os, argparse, mimetypes, hashlib, ConfigParser
+import sys
+import os
+import argparse
+import mimetypes
+import hashlib
+import ConfigParser
 import keyring
 import chardet
+import shutil
 import config as sys_config
 
 
@@ -259,6 +265,13 @@ def main():
         if not toever.createNote(note_title, toever.getResource(args.filename)):
             return toever.getCreateNoteError()
         return 0
+
+    # Binary Check
+    shutil.copyfileobj(sys.stdin, open(sys_config.tmp_filepath, 'w'))
+    if Util.isBinary(open(sys_config.tmp_filepath).read()):
+        return textui.colored.red("Please set the filename in the '-f' option")
+    sys.stdin = open(sys_config.tmp_filepath)
+    os.remove(sys_config.tmp_filepath)
 
     try:
         toever.setContent()
