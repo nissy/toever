@@ -18,7 +18,7 @@ Install
 
 Install mac osx
 -----
-    $ brew install ngc224/toever/toever
+    $ brew install nissy/toever/toever
 
 Setup
 -----
@@ -51,7 +51,7 @@ If you specify a file name in the option, it is saved as an attachment.
 
     $ curl https://www.python.org/static/img/python-logo.png | toever -f python.png
 
-    $ wget -O - https://github.com/ngc224/toever/archive/master.tar.gz | toever -f master.tar.gz
+    $ wget -O - https://github.com/nissy/toever/archive/master.tar.gz | toever -f master.tar.gz
 
 It is possible to acquire a share URL If you add the "--share" option
 
